@@ -1,0 +1,12 @@
+{
+  "name": "cachet",
+  "private": true,
+  "description": "Small, sharp SDKs for the EU Digital Identity Wallet.",
+  "type": "module",
+  "scripts": {
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "packageManager": "pnpm@8.7.4"
+}

@@ -1,0 +1,48 @@
+{
+  "name": "@cachet/sd-jwt",
+  "version": "0.1.0",
+  "description": "Decode and verify SD-JWT credentials, the format of the EU Digital Identity Wallet. Zero dependencies. Runs anywhere WebCrypto does.",
+  "keywords": [
+    "sd-jwt",
+    "sd-jwt-vc",
+    "eudi",
+    "eudi-wallet",
+    "eidas",
+    "verifiable-credentials",
+    "selective-disclosure",
+    "digital-identity",
+    "openid4vp"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "default": "./dist/testing.js"
+    }
+  },
+  "bin": {
+    "sd-jwt": "./dist/cli.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && chmod +x dist/cli.js",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.4"
+  }
+}

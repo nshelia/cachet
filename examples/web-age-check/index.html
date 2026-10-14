@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Age check · @cachet/sd-jwt</title>
+    <style>
+      :root { color-scheme: light dark; --fg: #111; --muted: #666; --bg: #fff; --card: #f4f4f5; --ok: #15803d; --bad: #b91c1c; }
+      @media (prefers-color-scheme: dark) { :root { --fg: #eee; --muted: #999; --bg: #0b0b0c; --card: #18181b; --ok: #4ade80; --bad: #f87171; } }
+      body { margin: 0; font: 15px/1.5 system-ui, sans-serif; color: var(--fg); background: var(--bg); }
+      main { max-width: 560px; margin: 48px auto; padding: 0 16px; }
+      h1 { font-size: 22px; margin: 0 0 4px; }
+      p { color: var(--muted); margin: 0 0 20px; }
+      button { font: inherit; padding: 8px 16px; border-radius: 8px; border: 0; background: var(--fg); color: var(--bg); cursor: pointer; }
+      pre { background: var(--card); padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+      .ok { color: var(--ok); } .bad { color: var(--bad); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Are you over 18?</h1>
+      <p>A test wallet shares one fact, <code>age_equal_or_over.18</code>, and the page verifies it. No name, no birth date.</p>
+      <button id="check">Verify with test wallet</button>
+      <h2 id="result" aria-live="polite"></h2>
+      <pre id="claims" hidden></pre>
+    </main>
+    <script type="module">
+      // After publishing, import from a CDN instead: https://esm.sh/@cachet/sd-jwt
+      import { verify } from "../../packages/sd-jwt/dist/index.js";
+      import { createTestIssuer, createTestWallet, samplePid } from "../../packages/sd-jwt/dist/testing.js";
+
+      const issuer = await createTestIssuer("https://pid.example.eu");
+      const wallet = await createTestWallet();
+      const credential = await issuer.issue(samplePid, { holder: wallet.publicKey });
+
+      document.querySelector("#check").addEventListener("click", async () => {
+        const result = document.querySelector("#result");
+        const claimsView = document.querySelector("#claims");
+
+        // In production the nonce comes from your server and verify() runs there too.
+        const nonce = crypto.randomUUID();
+        const audience = location.origin;
+        const presentation = await wallet.present(credential, { nonce, audience, disclose: ["age_equal_or_over.18"] });
+
+        try {
+          const { claims } = await verify(presentation, { issuerKey: issuer.publicKey, nonce, audience });
+          const adult = claims.age_equal_or_over?.["18"] === true;
+          result.textContent = adult ? "✓ Over 18" : "✗ Under 18";
+          result.className = adult ? "ok" : "bad";
+          const { iss, vct, age_equal_or_over } = claims;
+          claimsView.textContent = JSON.stringify({ iss, vct, age_equal_or_over }, null, 2);
+          claimsView.hidden = false;
+        } catch (error) {
+          result.textContent = `✗ ${error.message}`;
+          result.className = "bad";
+        }
+      });
+    </script>
+  </body>
+</html>

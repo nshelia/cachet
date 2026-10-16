@@ -1,7 +1,7 @@
 {
   "name": "cachet",
   "private": true,
-  "description": "Small, sharp SDKs for the EU Digital Identity Wallet.",
+  "description": "Verify credentials from the EU Digital Identity Wallet.",
   "type": "module",
   "scripts": {
     "build": "pnpm -r build",
